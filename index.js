@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
@@ -7,7 +8,12 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:5173/'
+  ],
+  credentials: true
+}));
 
 app.get("/", (req, res) => {
   res.send("CRUD Server is running");
@@ -36,6 +42,20 @@ async function run() {
     const queryCollection = client
       .db("alternativeproductDB")
       .collection("queries");
+
+
+    app.post('/jwt', async(req,res)=>{
+      const user = req.body;
+      const token = jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{
+        expiresIn: '1h'
+      });
+      res.cookie('token', token, {
+        httpOnly:true,
+        secure: true,
+        sameSite:'none'
+      })
+      send({success: true});
+    })
 
     app.get("/queries", async (req, res) => {
       const cursor = queryCollection.find();
