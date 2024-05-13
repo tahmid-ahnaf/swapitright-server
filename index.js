@@ -52,10 +52,15 @@ async function run() {
 
     app.get("/queriesByEmail/:email", async (req, res) => {
       const email = req.params.email;
-
+    
+      // Define the query to search for documents
       const query = { userEmail: email };
-
-      const cursor = queryCollection.find(query);
+    
+      const options = {
+        sort: { currentDateAndTime: -1 }
+      };
+    
+      const cursor = queryCollection.find(query, options);
       const result = await cursor.toArray();
       res.send(result);
     });
