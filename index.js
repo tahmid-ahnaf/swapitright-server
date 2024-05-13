@@ -71,6 +71,37 @@ async function run() {
       res.send(result);
     });
 
+    app.put("/update/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updatedQuery = req.body;
+      const updateDoc = {
+        $set: {
+          productName: updatedQuery.productName,
+          productBrand: updatedQuery.productBrand,
+
+          productImageURL: updatedQuery.productImageURL,
+
+          queryTitle: updatedQuery.queryTitle,
+
+          alternationReason: updatedQuery.alternationReason,
+        },
+      };
+
+      const result = await queryCollection.updateOne(filter,updateDoc,options);
+      res.send(result);
+    });
+
+
+    app.delete("/queries/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await queryCollection.deleteOne(query);
+      res.send(result);
+    });
+
+
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
     console.log(
