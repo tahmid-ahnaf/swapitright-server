@@ -33,11 +33,29 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
 
-    const queryCollection = client.db("alternativeproductDB").collection("queries");
-    
+    const queryCollection = client
+      .db("alternativeproductDB")
+      .collection("queries");
 
     app.get("/queries", async (req, res) => {
       const cursor = queryCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.get("/queries/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await queryCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.get("/queriesByEmail/:email", async (req, res) => {
+      const email = req.params.email;
+
+      const query = { userEmail: email };
+
+      const cursor = queryCollection.find(query);
       const result = await cursor.toArray();
       res.send(result);
     });
@@ -47,11 +65,6 @@ async function run() {
       const result = await queryCollection.insertOne(newQuery);
       res.send(result);
     });
-
-
-
-    
-
 
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
