@@ -53,8 +53,12 @@ async function run() {
         httpOnly:true,
         secure: true,
         sameSite:'none'
-      })
-      send({success: true});
+      }).send({success: true});
+    })
+
+    app.post("/logout", async(req,res)=>{
+      const user = req.body;
+      res.clearCookie('token', {maxAge:0}).send({success: true});
     })
 
     app.get("/queries", async (req, res) => {
