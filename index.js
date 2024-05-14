@@ -12,7 +12,9 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
   origin: [
-    'http://localhost:5173'
+    'http://localhost:5173',
+    'https://swapitright-5c4cc.web.app',
+    'https://swapitright-5c4cc.firebaseapp.com'
   ],
   credentials: true
 }));
@@ -67,6 +69,10 @@ async function run() {
       .db("alternativeproductDB")
       .collection("queries");
 
+    const recommendationCollection = client
+      .db("alternativeproductDB")
+      .collection("recommendations");
+
 
     app.post('/jwt', async(req,res)=>{
       const user = req.body;
@@ -117,6 +123,17 @@ async function run() {
     app.post("/queries", async (req, res) => {
       const newQuery = req.body;
       const result = await queryCollection.insertOne(newQuery);
+      res.send(result);
+    });
+
+    app.post("/recommendations", async (req, res) => {
+      const newRecommendation = req.body;
+      const result = await recommendationCollection.insertOne(newRecommendation);
+      const queryId = new ObjectId(newRecommendation.queryId);
+      const updateResult = await queryCollection.updateOne(
+        { _id: queryId },
+        { $inc: { recommendationCount: 1 } }
+      );
       res.send(result);
     });
 
