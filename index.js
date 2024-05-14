@@ -101,6 +101,28 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/recommendations/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { queryId: id };
+      const cursor = recommendationCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.get("/recommendationsByEmail/:email", verifyToken, async (req, res) => {
+      const email = req.params.email;
+      if(req.user.email !== email)
+        {
+          return res.status(403).send({message:'forbidden access'})
+        }
+    
+      // Define the query to search for documents
+      const query = { recommenderEmail: email };
+      const cursor = recommendationCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
     app.get("/queriesByEmail/:email", verifyToken, async (req, res) => {
       const email = req.params.email;
       if(req.user.email !== email)
@@ -166,7 +188,6 @@ async function run() {
       const result = await queryCollection.deleteOne(query);
       res.send(result);
     });
-
 
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
