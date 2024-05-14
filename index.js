@@ -123,6 +123,20 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/recommendationsForEmail/:email", verifyToken, async (req, res) => {
+      const email = req.params.email;
+      if(req.user.email !== email)
+        {
+          return res.status(403).send({message:'forbidden access'})
+        }
+    
+      // Define the query to search for documents
+      const query = { userEmail: email };
+      const cursor = recommendationCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
     app.get("/queriesByEmail/:email", verifyToken, async (req, res) => {
       const email = req.params.email;
       if(req.user.email !== email)
