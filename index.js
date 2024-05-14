@@ -189,6 +189,18 @@ async function run() {
       res.send(result);
     });
 
+    app.delete("/recommendations/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { queryId: id };
+      const result = await recommendationCollection.deleteOne(query);
+      const queryId = new ObjectId(id);
+      const updateResult = await queryCollection.updateOne(
+        { _id: queryId },
+        { $inc: { recommendationCount: -1 } }
+      );
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
     console.log(
