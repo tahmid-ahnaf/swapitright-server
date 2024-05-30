@@ -89,10 +89,31 @@ async function run() {
     });
 
     app.get("/queries", async (req, res) => {
-      const cursor = queryCollection.find();
+      const options = {
+        sort: { currentDateAndTime: -1 }
+      };
+      const result = await queryCollection.find().sort(options.sort).toArray();
+      res.send(result);
+    });
+
+    app.get("/allqueries/:filter", async (req, res) => {
+      const filter = req.params.filter;
+      let query;
+      let cursor;
+      if(filter==="All")
+      {
+        cursor = queryCollection.find();
+      }
+      else
+      {
+        query = {productName: filter};
+        cursor = queryCollection.find(query);
+      }
       const result = await cursor.toArray();
       res.send(result);
     });
+
+
 
     app.get("/queries/:id", async (req, res) => {
       const id = req.params.id;
@@ -171,6 +192,15 @@ async function run() {
         { $inc: { recommendationCount: 1 } }
       );
       res.send(result);
+    });
+
+    app.post("/vote/:id", async (req, res) => {
+      const id = req.params.id;
+      const updateResult = await queryCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $inc: { recommendationCount: 1 } }
+      );
+      res.send(updateResult);
     });
 
     app.put("/update/:id", async (req, res) => {
