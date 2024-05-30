@@ -194,14 +194,17 @@ async function run() {
       res.send(result);
     });
 
-    app.post("/vote/:id", async (req, res) => {
+    app.put("/queries/:id/vote", async (req, res) => {
       const id = req.params.id;
-      const updateResult = await queryCollection.updateOne(
-        { _id: new ObjectId(id) },
-        { $inc: { recommendationCount: 1 } }
-      );
-      res.send(updateResult);
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $inc: { voteCount: 1 },
+      };
+      const result = await queryCollection.updateOne(filter, updateDoc);
+      res.send(result);
     });
+
+    
 
     app.put("/update/:id", async (req, res) => {
       const id = req.params.id;
